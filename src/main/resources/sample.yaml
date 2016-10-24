@@ -1,0 +1,12 @@
+in: $1
+filters:
+  $1:
+    - isFile
+    - /(.*?)[-_. ]?s(\\d+)[-_. ]?e(\\d+).*?\\.([^.]+)/si
+vars:
+  series: $1.2.1.replace('[-_. ]+', ' ').header().replace('Xy', 'XY')
+  season: $1.2.2.int.padLeft(2, '0')
+  episode: $1.2.3.int.padLeft(2, '0')
+  extension: $1.2.4.lowerCase
+  title: ${series} - s${season}e${episode}
+out: ${series}/Season ${season}/${title}\.${extension}
