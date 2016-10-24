@@ -24,7 +24,6 @@ import java.util.List;
 public class Launcher {
 
     public static void main(String[] args) throws Exception {
-        args = new String[]{"--config=/Users/milad/Projects/Java/renamex/src/main/resources/sample.yaml", "/Users/milad/a"};
         if (args.length == 0) {
             wrongUsage();
         }
