@@ -24,7 +24,7 @@ import java.util.List;
 public class Launcher {
 
     public static void main(String[] args) throws Exception {
-        args = new String[]{"--dryrun", "--config=/Users/milad/Projects/Java/renamex/src/main/resources/sample.yaml", "/Users/milad/a"};
+        args = new String[]{"--config=/Users/milad/Projects/Java/renamex/src/main/resources/sample.yaml", "/Users/milad/a"};
         if (args.length == 0) {
             wrongUsage();
         }
@@ -86,9 +86,37 @@ public class Launcher {
         final List<FileMetadata> list = scanner.scan(root);
         final FunctionCall outputCall = compiled.getOutput();
         final CompositeMapper mapper = (CompositeMapper) functionRegistry.get(outputCall.getName());
-        for (FileMetadata metadata : list) {
-            final String newName = mapper.call(metadata.getFile(), new ImmutableCallContext(functionRegistry, metadata.getGroups(), outputCall.getArguments()));
-            System.out.println(newName);
+        System.out.println("Discovered " + list.size() + " file(s).");
+        if (compiled.isDryRun()) {
+            System.out.println("This is a dry run. No files will be modified.");
+        }
+        for (int i = 0; i < list.size(); i++) {
+            final FileMetadata metadata = list.get(i);
+            final File file = metadata.getFile();
+            final String newName = mapper.call(file, new ImmutableCallContext(functionRegistry, metadata.getGroups(), outputCall.getArguments()));
+            final String originalName = file.getAbsolutePath().substring(root.getAbsolutePath().length() + 1);
+            System.out.print("[" + (i + 1) + "/" + list.size() + "] ");
+            System.out.println("Renaming `" + originalName + "` to `" + newName + "`");
+            if (!compiled.isDryRun()) {
+                final File newFile = new File(root.getAbsolutePath() + "/" + newName);
+                final File parentFile = newFile.getParentFile();
+                if (!parentFile.exists()) {
+                    if (!parentFile.mkdirs()) {
+                        System.out.println(" >> Could not create parent directory `" + parentFile.getAbsolutePath() + "`");
+                        continue;
+                    }
+                } else if (!parentFile.isDirectory()) {
+                    System.out.println(" >> Parent location is not a directory. Ignoring.");
+                    continue;
+                }
+                if (newFile.exists()) {
+                    System.out.println(" >> File already exists. Ignoring.");
+                    continue;
+                }
+                if (!file.renameTo(newFile)) {
+                    System.out.println(" >> Could not rename the file");
+                }
+            }
         }
     }
 
