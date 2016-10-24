@@ -1,0 +1,17 @@
+in: $1/$2/$3
+filters:
+  $1:
+    - isDir
+    - /(.*)/s
+  $2:
+    - isDir
+    - /season\\s+(\\d+)/si
+  $3:
+    - isFile
+    - /.*?- s\\d+e(\\d+).([^.]+)/si
+vars:
+  series: $1.2.1.lowerCase().replace('\\s+', '.')
+  season: $2.2.1.int.padLeft(2, '0')
+  episode: $3.2.1.int.padLeft(2, '0')
+  extension: $3.2.2.lowerCase()
+out: ${series}.s${season}.e${episode}.${extension}
