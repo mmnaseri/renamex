@@ -4,7 +4,7 @@ filters:
     - isFile
     - /(.*?)[-_. ]?s(\\d+)[-_. ]?e(\\d+).*?\\.([^.]+)/si
 vars:
-  series: $1.2.1.replace('[-_. ]+', ' ').header().replace('Xy', 'XY')
+  series: $1.2.1.replace('[-_. ]+', ' ').header()
   season: $1.2.2.int.padLeft(2, '0')
   episode: $1.2.3.int.padLeft(2, '0')
   extension: $1.2.4.lowerCase
